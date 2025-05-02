@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JR Arquitectura y Diseño</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
+    header {
+      background-color: black;
+      padding: 30px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: start;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 10;
+    }
+    header img {
+      height: 200px;
+      width: auto;
+      max-width: 3500px;
+      object-fit: contain;
+      cursor: pointer;
+    }
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      margin-left: 40px;
+    }
+    .nav-links a {
+      color: #db1111;
+      font-size: 28px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      cursor: pointer;
+    }
+    .nav-links a:hover {
+      color: #ffffff;
+    }
+    .hero {
+      margin-top: 250px;
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+    .background-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: black;
+      transition: background-image 1s ease-in-out, opacity 1s ease-in-out;
+      z-index: -1;
+    }
+    .overlay-text {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2em;
+      font-weight: bold;
+      opacity: 1;
+      transition: opacity 1s ease-in-out;
+      pointer-events: none;
+      z-index: 1;
+      max-width: 90%;
+    }
+    section {
+      display: none;
+      padding: 20px;
+      background-color: black;
+      margin: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+    footer {
+      background: black;
+      padding: 20px;
+      position: relative;
+      z-index: 2;
+      margin-top: 20px;
+    }
+    .social-icons img {
+      width: 120px;
+      height: 130px;
+      vertical-align: middle;
+    }
+    .galeria-proyectos-scrollable {
+      max-height: 600px;
+      overflow-y: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      padding: 10px;
+      border: 2px solid #444;
+      border-radius: 10px;
+    }
+    .proyecto {
+      background-color: #1c1c1c;
+      border-radius: 12px;
+      overflow: hidden;
+      width: 300px;
+      transition: transform 0.3s ease;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+    }
+    .proyecto:hover {
+      transform: translateY(-5px);
+    }
+    .proyecto h3 {
+      margin: 10px 0 5px;
+    }
+    .proyecto p {
+      padding: 0 15px 15px;
+      font-size: 0.95em;
+      color: #ccc;
+    }
+    .galeria-interna-scrollable {
+      max-height: 200px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px;
+      position: relative;
+    }
+    .galeria-interna-scrollable img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .galeria-interna-scrollable img:hover {
+      transform: none;
+    }
+    #scroll-bar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background-color: rgba(255, 255, 255, 0.2);
+      z-index: 9999;
+    }
+    #scroll-bar {
+      height: 4px;
+      background-color: #db1111;
+      width: 0;
+      transition: width 0.1s ease-out;
+    }
+    @media (max-width: 150px) {
+      .overlay-text {
+        font-size: 1.2em;
+        top: 45%;
+      }
+      header img {
+        height: 150px;
+      }
+      .galeria-proyectos-scrollable {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.9);
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .modal-contenido {
+      margin: auto;
+      display: block;
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #fff;
+    }
+    .cerrar {
+      position: absolute;
+      top: 30px;
+      right: 40px;
+      color: #fff;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #contacto h1, #sobre-nosotros h1,
+    #contacto h2, #sobre-nosotros h2 {
+      font-size: 5.2em;
+      font-weight: bold;
+    }
+    #contacto p, #sobre-nosotros p {
+      font-size: 3.6em;
+      line-height: 1.6;
+    }
+    .whatsapp-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #25d366;
+  color: white;
+  border-radius: 30px;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  transition: transform 0.2s ease;
+}
+.whatsapp-float:hover {
+  transform: scale(1.05);
+}
+.whatsapp-float img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+.whatsapp-float span {
+  font-size: 16px;
+  font-weight: bold;
+}
+@media (max-width: 768px) {
+  .whatsapp-float span {
+    display: none; /* En móviles solo se ve el ícono */
+  }
+}
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px;
+  }
+
+  header img {
+    height: 100px;
+    margin-bottom: 10px;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    gap: 15px;
+    margin-left: 0;
+    align-items: center;
+  }
+
+  .nav-links a {
+    font-size: 20px;
+  }
+}
+  </style>
+</head>
+<body>
+  <header>
+    <img src="img/logo.jpeg" onclick="reiniciarPagina()">
+    <nav class="nav-links">
+      <a href="#contacto" onclick="mostrarSeccion('contacto')">Contacto</a>
+      <a href="#sobre-nosotros" onclick="mostrarSeccion('sobre-nosotros')">Sobre Nosotros</a>
+      <a href="#proyectos" onclick="mostrarProyectos()">Proyectos</a>
+    </nav>    
+  </header>
+  <div class="hero">
+    <div class="background-container" id="background"></div>
+    <div class="overlay-text" id="dynamicText">HACEMOS TUS SUEÑOS REALIDAD</div>
+  </div>
+  <section id="contacto">
+    <h2>Contacto</h2>
+    <p>Encuentra nuestras redes sociales:</p>
+    <div class="social-icons">
+      <a href="https://www.facebook.com/profile.php?id=61575712623597" target="_blank"><img src="img/facebook-logo.png" alt="Facebook"></a>
+      <a href="https://www.instagram.com/jr_arquitectura_y_diseno?igsh=MTJlNHhlazFoczk0Yg%3D%3D&utm_source=qr" target="_blank"><img src="img/instagram-logo.png" alt="Instagram"></a>
+    </div>
+  </section>
+  <section id="sobre-nosotros">
+    <h2>Sobre Nosotros</h2>
+    <p>
+        Somos una empresa 100% mexicana fundada en 2004 por arquitectos mexicanos. Ofrecemos servicios profesionales en construcción, diseño, asesoría e imagen de espacios arquitectónicos y mobiliario, creando ambientes de confort habitacional, empresarial y comercial. Nuestra principal meta es satisfacer las necesidades de nuestros clientes, buscando el equilibrio entre costo, calidad y tiempo.
+      </p>
+    <h1>COSTO + CALIDAD + TIEMPO</h1>
+  </section>
+  <section id="proyectos" class="proyecto-container" style="display: none;">
+    <h2>Proyectos</h2>
+    <div class="galeria-proyectos-scrollable">
+      <!-- Proyecto 1: Habitacional -->
+      <div class="proyecto">
+        <div class="galeria-interna-scrollable">
+          <img src="img/imagen-proyecto-1.jpg">
+          <img src="img/imagen-proyecto-2.jpg">
+          <img src="img/imagen-proyecto-3.jpg">
+          <img src="img/imagen-proyecto-4.jpg">
+        </div>
+        <h3>Habitacional</h3>
+      </div>
+      <!-- Proyecto 2: comercial-->
+      <div class="proyecto">
+        <div class="galeria-interna-scrollable">
+          <img src="img/imagen-comercial.jpg">
+        <h3>Terminal poniente de autobuses</h3>
+        <img src="img/imagen-restaurante.jpg">
+        <h3>Restaurante- De santos - Polanco</h3>
+        <img src="img/imagen-restaurante-crown-fish.jpg">
+        <h3>Restaurante-Crown Fish - Zona Esmeralda</h3>
+        <img src="img/imagen-nigth-club.jpg">
+        <h3>Nigth Club - Janis - Col. Roma</h3>
+        <img src="img/imagen-expo.jpg">
+        <h3>Expo - IUSACELL</h3>
+      </div>
+      <h3>Comercial</h3>
+    </div>
+  </section>
+  <div id="scroll-bar-container">
+    <div id="scroll-bar"></div>
+  </div>
+  <div id="imagenExpandida" class="modal">
+    <span class="cerrar" onclick="cerrarModal()">&times;</span>
+    <img class="modal-contenido" id="imgModal">
+  </div>
+  <script>
+    function updateScrollBar() {
+      const scrollPosition = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercentage = (scrollPosition / docHeight) * 100;
+      document.getElementById('scroll-bar').style.width = `${scrollPercentage}%`;
+    }
+    window.addEventListener('scroll', updateScrollBar);
+
+    const images = [
+      'img/imagen-de-inicio-1.png',
+      'img/imagen-de-inicio-2.png',
+      'img/imagen-de-inicio-3.png',
+      'img/imagen-de-inicio-4.png',
+    ];
+    const textArray = [
+      "HACEMOS TUS SUEÑOS REALIDAD",
+      "PROYECTO, CONSTRUCCIÓN, DISEÑO DE INTERIORES",
+      "Credito hipotecario",
+      "COSTO + CALIDAD + TIEMPO"
+    ];
+    let currentIndex = 0;
+
+    function cambiarImagenYTexto() {
+      const background = document.getElementById('background');
+      const textElement = document.getElementById('dynamicText');
+      textElement.style.opacity = 0;
+      background.style.opacity = 0.3;
+      setTimeout(() => {
+        background.style.backgroundImage = `url('${images[currentIndex]}')`;
+        textElement.innerText = textArray[currentIndex];
+        textElement.style.opacity = 1;
+        background.style.opacity = 1;
+        currentIndex = (currentIndex + 1) % images.length;
+      }, 500);
+    }
+
+    setInterval(cambiarImagenYTexto, 5000);
+    cambiarImagenYTexto();
+
+    function mostrarSeccion(id) {
+      document.querySelectorAll('section').forEach(seccion => seccion.style.display = 'none');
+      document.querySelectorAll('.proyecto-container').forEach(p => p.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+      window.scrollTo({
+        top: document.getElementById(id).offsetTop - 60,
+        behavior: 'smooth'
+      });
+    }
+
+    function mostrarProyectos() {
+      document.querySelectorAll('section').forEach(seccion => seccion.style.display = 'none');
+      document.querySelectorAll('.proyecto-container').forEach(p => p.style.display = 'block');
+      window.scrollTo({
+        top: document.querySelector('.proyecto-container').offsetTop - 60,
+        behavior: 'smooth'
+      });
+    }
+
+    function reiniciarPagina() {
+      document.querySelectorAll('section').forEach(seccion => seccion.style.display = 'none');
+      document.querySelectorAll('.proyecto-container').forEach(p => p.style.display = 'none');
+      const textElement = document.getElementById('dynamicText');
+      textElement.style.display = 'block';
+      textElement.innerText = textArray[0];
+      textElement.style.opacity = 1;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById("imagenExpandida");
+      const modalImg = document.getElementById("imgModal");
+
+      document.querySelectorAll('.galeria-interna-scrollable img').forEach(img => {
+        img.addEventListener('mouseenter', function () {
+          modalImg.src = this.src;
+          modal.style.display = "flex";
+          requestAnimationFrame(() => {
+            modal.style.opacity = 1;
+          });
+        });
+
+        img.addEventListener('mouseleave', function () {
+          setTimeout(() => {
+            if (!modal.matches(':hover')) cerrarModal();
+          }, 150);
+        });
+      });
+
+      modal.addEventListener('mouseleave', cerrarModal);
+    });
+
+    function cerrarModal() {
+      const modal = document.getElementById("imagenExpandida");
+      modal.style.opacity = 0;
+      setTimeout(() => {
+        modal.style.display = "none";
+      }, 300);
+    }
+  </script>
+  <a href="https://wa.me/5614645681?text=Hola,%20quiero%20más%20información%20sobre%20sus%20servicios"
+   class="whatsapp-float" target="_blank">
+  <img src="img/logo-whatsapp.jpg" alt="WhatsApp" />
+  <span>Contáctanos</span>
+</a>
+</body>
+</html>  
